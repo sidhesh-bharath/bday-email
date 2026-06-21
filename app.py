@@ -34,7 +34,7 @@ def save_settings(data):
     with open(SETTINGS_FILE, 'w') as f:
         json.dump(data, f, indent=4)
 
-def load_json(file_path="birthdays.json"):
+def load_json(file_path="data/birthdays.json"):
     if not os.path.exists(file_path):
         with open(file_path, 'w') as file:
             json.dump({}, file)
@@ -43,7 +43,7 @@ def load_json(file_path="birthdays.json"):
         try: return json.load(file)
         except json.JSONDecodeError: return {}
 
-def save_json(data, file_path="birthdays.json"):
+def save_json(data, file_path="data/birthdays.json"):
     with open(file_path, 'w') as file:
         json.dump(data, file, indent=4)
 
@@ -166,9 +166,9 @@ def clear_birthdays():
 
 @app.route('/export-birthdays')
 def export_birthdays():
-    if not os.path.exists("birthdays.json"):
+    if not os.path.exists("data/birthdays.json"):
         save_json({})
-    return send_file("birthdays.json", as_attachment=True, download_name="birthdays_backup.json")
+    return send_file("data/birthdays.json", as_attachment=True, download_name="birthdays_backup.json")
 
 @app.route('/import-birthdays', methods=['POST'])
 def import_birthdays():

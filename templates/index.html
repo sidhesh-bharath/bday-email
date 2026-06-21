@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BDay Email</title>
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title"><span class="highlight">BDay</span> Email</h1>
+            <p class="description">A simple tool to send birthday emails to your friends and family.</p>
+        </header>
+
+        <main class="birthdays-section">
+            <h2>Upcoming Birthdays</h2>
+            <div class="birthdays-grid">
+                {% if birthdays %}
+                    {% for person in birthdays %}
+                    <div class="card {{ person.status }}">
+                        <div class="days-left-container">
+                            <h3 class="days-left">{{ person.days_label }}</h3>
+                            {% if person.status == 'normal' %}
+                            <p class="days-left-label">Days Left</p>
+                            {% endif %}
+                        </div>
+                        <div class="details-container">
+                            <h4 class="name">{{ person.name }}</h4>
+                            <p class="date">{{ person.date }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <p>No upcoming birthdays found.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+
+    <div class="floating-controls">
+        <button class="add-birthday-fab" id="openModal" aria-label="Add Birthday">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        </button>
+        <button class="settings-trigger" id="openSettings" aria-label="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+        </button>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h3>Add New Birthday</h3>
+            <form id="birthdayForm" action="/submit-form" method="POST">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input name="name" type="text" id="name" required placeholder="e.g. John Doe">
+                </div>
+                <div class="form-group">
+                    <label for="dob">Date of Birth</label>
+                    <input name="dob" type="text" id="dob" required placeholder="DD-MM-YYYY" pattern="\d{2}-\d{2}-\d{4}">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="closeModal">Cancel</button>
+                    <button type="submit" class="btn-submit">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="settingsOverlay">
+        <div class="modal">
+            <h3>App Settings</h3>
+            
+            <div class="settings-section-group">
+                <label>Theme Presets</label>
+                <div class="theme-switcher">
+                    <button class="theme-dot" data-color="#e56666" style="background-color: #e56666;"></button>
+                    <button class="theme-dot" data-color="#e5ab66" style="background-color: #e5ab66;"></button>
+                    <button class="theme-dot" data-color="#abe566" style="background-color: #abe566;"></button>
+                    <button class="theme-dot" data-color="#66e5a4" style="background-color: #66e5a4;"></button>
+                    <button class="theme-dot" data-color="#66aee5" style="background-color: #66aee5;"></button>
+                    <button class="theme-dot" data-color="#a466e5" style="background-color: #a466e5;"></button>
+                    <label class="custom-color-picker rainbow-target" title="Custom Color">
+                        <input type="color" id="customColorInput" value="#e56666">
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-section-group">
+                <label>Data Management</label>
+                <div class="settings-data-row">
+                    <a href="/export-birthdays" class="btn-primary-action">Export JSON</a>
+                    <label for="importFile" class="btn-secondary-action">Import JSON</label>
+                    <form id="importForm" action="/import-birthdays" method="POST" enctype="multipart/form-data" style="display: none;">
+                        <input type="file" id="importFile" name="backup_file" accept=".json" onchange="document.getElementById('importForm').submit();">
+                    </form>
+                </div>
+            </div>
+
+            <div class="settings-section-group destructive">
+                <form id="clearForm" action="/clear-birthdays" method="POST" onsubmit="return handleClearProcess(event);">
+                    <button type="submit" class="btn-danger-link-centered">Clear All Birthday Data</button>
+                </form>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-close-accent" id="closeSettings">Close Panel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('modalOverlay');
+        const openBtn = document.getElementById('openModal');
+        const closeBtn = document.getElementById('closeModal');
+        const form = document.getElementById('birthdayForm');
+        const dobInput = document.getElementById('dob');
+
+        const settings = document.getElementById('settingsOverlay');
+        const openSettingsBtn = document.getElementById('openSettings');
+        const closeSettingsBtn = document.getElementById('closeSettings');
+        const customColorInput = document.getElementById('customColorInput');
+
+        openBtn.addEventListener('click', () => modal.classList.add('active'));
+        closeBtn.addEventListener('click', () => { modal.classList.remove('active'); form.reset(); });
+        
+        openSettingsBtn.addEventListener('click', () => settings.classList.add('active'));
+        closeSettingsBtn.addEventListener('click', () => settings.classList.remove('active'));
+
+        [modal, settings].forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                    if (overlay === modal) form.reset();
+                }
+            });
+        });
+
+        dobInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 8) value = value.slice(0, 8);
+            let formattedValue = '';
+            if (value.length > 0) formattedValue += value.substring(0, 2);
+            if (value.length > 2) formattedValue += '-' + value.substring(2, 4);
+            if (value.length > 4) formattedValue += '-' + value.substring(4, 8);
+            e.target.value = formattedValue;
+        });
+
+        function handleClearProcess(event) {
+            event.preventDefault();
+            if (confirm("Are you sure you want to clear all birthdays? A backup copy will download automatically first.")) {
+                window.location.href = '/export-birthdays';
+                setTimeout(() => {
+                    document.getElementById('clearForm').submit();
+                }, 1000);
+            }
+        }
+
+        function applyThemeColor(color) {
+            document.documentElement.style.setProperty('--primary-color', color);
+            localStorage.setItem('theme-color', color);
+            customColorInput.value = color;
+        }
+
+        const savedColor = localStorage.getItem('theme-color') || '#e56666';
+        applyThemeColor(savedColor);
+
+        document.querySelectorAll('.theme-dot').forEach(dot => {
+            dot.addEventListener('click', () => {
+                applyThemeColor(dot.getAttribute('data-color'));
+            });
+        });
+
+        customColorInput.addEventListener('input', (e) => {
+            applyThemeColor(e.target.value);
+        });
+    </script>
+</body>
+</html>

@@ -33,7 +33,7 @@
                     {% endfor %}
                 {% else %}
                     <div class="empty-state">
-                        <p>No upcoming birthdays found.</p>
+                        <p class="empty-state-text">No upcoming birthdays found.</p>
                     </div>
                 {% endif %}
             </div>
@@ -79,39 +79,64 @@
         <div class="modal">
             <h3>App Settings</h3>
             
-            <div class="settings-section-group">
-                <label>Theme Presets</label>
-                <div class="theme-switcher">
-                    <button class="theme-dot" data-color="#e56666" style="background-color: #e56666;"></button>
-                    <button class="theme-dot" data-color="#e5ab66" style="background-color: #e5ab66;"></button>
-                    <button class="theme-dot" data-color="#abe566" style="background-color: #abe566;"></button>
-                    <button class="theme-dot" data-color="#66e5a4" style="background-color: #66e5a4;"></button>
-                    <button class="theme-dot" data-color="#66aee5" style="background-color: #66aee5;"></button>
-                    <button class="theme-dot" data-color="#a466e5" style="background-color: #a466e5;"></button>
-                    <label class="custom-color-picker rainbow-target" title="Custom Color">
-                        <input type="color" id="customColorInput" value="#e56666">
-                    </label>
+            <form action="/save-settings" method="POST">
+                <div class="settings-section-group">
+                    <label>Email Alerts</label>
+                    <div class="email-toggle-row">
+                        <span class="toggle-label-text">Enable Notifications</span>
+                        <label class="switch">
+                            <input type="checkbox" name="email_enabled" {% if settings.enabled %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="form-group" style="margin-top: 8px; margin-bottom: 8px;">
+                        <input name="alert_email" type="email" id="alertEmail" value="{{ settings.email }}" placeholder="your-alert-email@domain.com">
+                    </div>
+                    
+                    <button type="submit" formaction="/test-email" class="btn-secondary-action" style="width: 100%; font-size: 0.85em; padding: 10px; cursor: pointer;">
+                        Send Test Email
+                    </button>
                 </div>
-            </div>
 
-            <div class="settings-section-group">
-                <label>Data Management</label>
-                <div class="settings-data-row">
-                    <a href="/export-birthdays" class="btn-primary-action">Export JSON</a>
-                    <label for="importFile" class="btn-secondary-action">Import JSON</label>
-                    <form id="importForm" action="/import-birthdays" method="POST" enctype="multipart/form-data" style="display: none;">
-                        <input type="file" id="importFile" name="backup_file" accept=".json" onchange="document.getElementById('importForm').submit();">
-                    </form>
+                <div class="settings-section-group">
+                    <label>Theme Presets</label>
+                    <div class="theme-switcher">
+                        <button type="button" class="theme-dot" data-color="#e56666" style="background-color: #e56666;"></button>
+                        <button type="button" class="theme-dot" data-color="#e5ab66" style="background-color: #e5ab66;"></button>
+                        <button type="button" class="theme-dot" data-color="#abe566" style="background-color: #abe566;"></button>
+                        <button type="button" class="theme-dot" data-color="#66e5a4" style="background-color: #66e5a4;"></button>
+                        <button type="button" class="theme-dot" data-color="#66aee5" style="background-color: #66aee5;"></button>
+                        <button type="button" class="theme-dot" data-color="#a466e5" style="background-color: #a466e5;"></button>
+                        <label class="custom-color-picker rainbow-target" title="Custom Color">
+                            <input type="color" id="customColorInput" value="#e56666">
+                        </label>
+                    </div>
                 </div>
-            </div>
 
-            <div class="settings-section-group destructive">
+                <div class="settings-section-group">
+                    <label>Data Management</label>
+                    <div class="settings-data-row">
+                        <a href="/export-birthdays" class="btn-primary-action">Export JSON</a>
+                        <label for="importFile" class="btn-secondary-action">Import JSON</label>
+                    </div>
+                </div>
+
+                <div class="modal-actions" style="margin-top: 16px;">
+                    <button type="submit" class="btn-submit" style="width: 100%; text-align: center;">Save & Close</button>
+                </div>
+            </form>
+
+            <form id="importForm" action="/import-birthdays" method="POST" enctype="multipart/form-data" style="display: none;">
+                <input type="file" id="importFile" name="backup_file" accept=".json" onchange="document.getElementById('importForm').submit();">
+            </form>
+
+            <div class="settings-section-group destructive" style="margin-top: 16px;">
                 <form id="clearForm" action="/clear-birthdays" method="POST" onsubmit="return handleClearProcess(event);">
                     <button type="submit" class="btn-danger-link-centered">Clear All Birthday Data</button>
                 </form>
             </div>
 
-            <div class="modal-actions">
+            <div class="modal-actions" style="margin-top: 8px;">
                 <button type="button" class="btn-close-accent" id="closeSettings">Close Panel</button>
             </div>
         </div>
